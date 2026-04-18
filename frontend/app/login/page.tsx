@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createMockToken, hasAuthCookieInBrowser, setAuthCookie } from "@/lib/auth";
 
 type Mode = "login" | "register";
 
@@ -13,6 +14,12 @@ export default function LoginPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (hasAuthCookieInBrowser()) {
+      router.replace("/");
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +39,13 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    // TODO: 実際の認証処理に置き換える
-    await new Promise((r) => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 500));
+
+    const token = createMockToken(email.trim());
+    setAuthCookie(token);
+
     setLoading(false);
-    router.push("/");
+    router.replace("/");
   };
 
   const switchMode = (next: Mode) => {

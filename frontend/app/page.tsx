@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { clearAuthCookie, hasAuthCookieInBrowser } from "@/lib/auth";
 
 type StatusType = "ok" | "busy" | "home" | "out" | "sleep" | "sos";
 
@@ -157,6 +159,7 @@ function SidebarLogo() {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [groups, setGroups] = useState<Group[]>(initialGroups);
   const [activeGroupId, setActiveGroupId] = useState<number>(1);
   const [myStatus, setMyStatus] = useState<StatusType>("home");
@@ -165,6 +168,12 @@ export default function Home() {
   const [newGroupName, setNewGroupName] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState(EMOJI_OPTIONS[0]);
   const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!hasAuthCookieInBrowser()) {
+      router.replace("/login");
+    }
+  }, [router]);
 
   const activeGroup = groups.find((g) => g.id === activeGroupId)!;
 
@@ -199,6 +208,11 @@ export default function Home() {
     setSelectedEmoji(EMOJI_OPTIONS[0]);
     setShowModal(false);
     showToast(`「${name}」グループを作成しました`);
+  };
+
+  const handleLogout = () => {
+    clearAuthCookie();
+    router.replace("/login");
   };
 
   return (
@@ -274,12 +288,20 @@ export default function Home() {
               <p className="text-[12px] text-zinc-400">メンバー {activeGroup.members.length}人</p>
             </div>
           </div>
-          <button
-            onClick={() => showToast("招待リンクをコピーしました")}
-            className="text-[12px] px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors shrink-0"
-          >
-            + 招待
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => showToast("招待リンクをコピーしました")}
+              className="text-[12px] px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            >
+              + 招待
+            </button>
+            <button
+              onClick={handleLogout}
+              className="text-[12px] px-3 py-1.5 rounded-lg border border-red-200 dark:border-red-800 text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+            >
+              ログアウト
+            </button>
+          </div>
         </div>
 
         {/* My status bar */}
@@ -362,7 +384,7 @@ export default function Home() {
               }`}
             >
               <span className="text-xl leading-none">{g.emoji}</span>
-              <span className="text-[10px] truncate max-w-[52px]">{g.name}</span>
+              <span className="text-[10px] truncate max-w-13">{g.name}</span>
             </button>
           ))}
           <button
