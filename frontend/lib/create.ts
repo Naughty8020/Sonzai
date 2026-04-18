@@ -1,7 +1,6 @@
   
 import { useAtom } from "jotai";
 import type { Group } from "@/app/type/Group";
-
 import {
   EMOJI_OPTIONS,
   activeGroupIdAtom,

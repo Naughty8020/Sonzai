@@ -1,6 +1,8 @@
 import { atom } from "jotai";
 import { initialGroups } from "@/app/data/group";
-import type { Group, StatusType } from "@/app/data/group";
+import type { Group } from "@/app/type/Group";
+import type { StatusType } from "@/app/type/Status";  
+
 
 export const EMOJI_OPTIONS = ["🏠", "⭐", "💼", "🎮", "🎵", "📚", "🌸", "🍜", "🐶", "🏃", "🎨", "✈️"];
 

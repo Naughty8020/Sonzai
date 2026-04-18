@@ -1,4 +1,4 @@
-import type { StatusType } from "@/app/data/group";
+import type { StatusType } from "@/app/type/Status";
 
 export const statusStyles: Record<StatusType, { badge: string; dot: string }> = {
   ok: { badge: "bg-green-100 text-green-800", dot: "bg-green-500" },
