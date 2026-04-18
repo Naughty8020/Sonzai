@@ -1,15 +1,13 @@
 "use client";
 
 import { useAtom } from "jotai";
-import type { Group } from "@/app/data/group";
 import {
   EMOJI_OPTIONS,
-  activeGroupIdAtom,
-  groupsAtom,
   newGroupNameAtom,
   selectedEmojiAtom,
   showModalAtom,
 } from "@/app/store/groupAtoms";
+import { useCreateGroup } from "@/app/api/create";
 
 interface CreateGroupProps {
   onCreated?: (groupName: string) => void;
@@ -19,8 +17,8 @@ export default function CreateGroup({ onCreated }: CreateGroupProps) {
   const [showModal, setShowModal] = useAtom(showModalAtom);
   const [newGroupName, setNewGroupName] = useAtom(newGroupNameAtom);
   const [selectedEmoji, setSelectedEmoji] = useAtom(selectedEmojiAtom);
-  const [groups, setGroups] = useAtom(groupsAtom);
-  const [, setActiveGroupId] = useAtom(activeGroupIdAtom);
+  const { handleCreateGroup } = useCreateGroup(onCreated);
+
 
   if (!showModal) {
     return null;
@@ -29,26 +27,6 @@ export default function CreateGroup({ onCreated }: CreateGroupProps) {
   const closeModal = () => {
     setShowModal(false);
     setNewGroupName("");
-  };
-
-  const handleCreateGroup = () => {
-    const name = newGroupName.trim();
-    if (!name) return;
-
-    const newGroup: Group = {
-      id: Date.now(),
-      name,
-      emoji: selectedEmoji,
-      color: "bg-zinc-50",
-      members: [],
-    };
-
-    setGroups([...groups, newGroup]);
-    setActiveGroupId(newGroup.id);
-    setNewGroupName("");
-    setSelectedEmoji(EMOJI_OPTIONS[0]);
-    setShowModal(false);
-    onCreated?.(name);
   };
 
   return (
