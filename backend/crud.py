@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 import schemas
-from models import Group
+from models import Group, User
 
 STATUS = {
     "ok": {"label": "元気", "emoji": "😊"},
@@ -29,6 +29,29 @@ def format_elapsed_time(updated_at: datetime) -> str:
     else:
         return f"{seconds // 86400}日前"
 
+def member_to_response(member: User) -> dict:
+    status_info = STATUS[member.status]
+    return {
+        "id": member.id,
+        "name": member.name,
+        "initials": member.initials,
+        "avatarBg": member.avatar_bg,
+        "avatarText": member.avatar_text,
+        "status": member.status,
+        "statusLabel": status_info["label"],
+        "statusEmoji": status_info["emoji"],
+        "time": format_elapsed_time(member.updated_at),
+    }
+
+def group_to_response(group: Group) -> dict:
+    return {
+        "id": group.id,
+        "name": group.name,
+        "emoji": group.emoji,
+        "color": group.color,
+        "members": [member_to_response(member) for member in group.members]
+    }
+
 def create_group(payload: schemas.CreateGroup, db: Session):
     new_group = Group(
         name = payload.name,
@@ -45,6 +68,8 @@ def create_group(payload: schemas.CreateGroup, db: Session):
         "color": new_group.color,
         "users": []
     }
+
+
 
 def update_status(payload: schemas.UpdateState, db: Session):
     new_status = payload.status
