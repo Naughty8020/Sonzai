@@ -3,6 +3,15 @@ from datetime import datetime, timezone
 import schemas
 from models import Group
 
+STATUS = {
+    "ok": {"label": "元気", "emoji": "😊"},
+    "busy": {"label": "忙しい", "emoji": "⚡"},
+    "home": {"label": "在宅", "emoji": "🏠"},
+    "out": {"label": "外出中", "emoji": "🚶"},
+    "sleep": {"label": "就寝", "emoji": "😴"},
+    "sos": {"label": "SOS", "emoji": "🆘"},
+}
+
 def format_elapsed_time(updated_at: datetime) -> str:
     now = datetime.now(timezone.utc)
 
