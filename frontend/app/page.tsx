@@ -9,14 +9,11 @@ import OtherStatus from "./components/OtherStatus/OtherStatis";
 import MyStatus from "./components/Status/MyStatus";
 import CreateGroup from "./components/CreateGroup/CreateGroup";
 import {
-  showMobileMenuAtom,
   showToastAtom,
   toastAtom,
 } from "./store/groupAtoms";
 
 export default function Home() {
-  const showMobileMenu = useAtomValue(showMobileMenuAtom);
-  const setShowMobileMenu = useSetAtom(showMobileMenuAtom);
   const showToast = useSetAtom(showToastAtom);
   const toast = useAtomValue(toastAtom);
 
