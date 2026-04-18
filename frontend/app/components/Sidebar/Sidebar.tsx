@@ -1,4 +1,4 @@
-
+"use client";1
 
 import SidebarContent from "./SidebarContent";
 import SidebarLogo from "../logo";

@@ -1,3 +1,5 @@
+"use client";
+
 import { useAtomValue } from "jotai";
 import { activeGroupAtom } from "@/app/store/groupAtoms";
 import type { StatusType } from "@/app/data/group";
