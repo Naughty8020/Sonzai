@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
 from datetime import datetime, timezone
 import schemas
 from models import Group, User
@@ -29,6 +30,25 @@ def format_elapsed_time(updated_at: datetime) -> str:
     else:
         return f"{seconds // 86400}日前"
 
+
+def create_group(payload: schemas.CreateGroup, db: Session):
+    new_group = Group(
+        name = payload.name,
+        emoji = payload.emoji,
+        color = payload.color
+    )
+    db.add(new_group)
+    db.commit()
+    db.refresh(new_group)
+    return {
+        "id": new_group.id,
+        "name": new_group.name,
+        "emoji": new_group.emoji,
+        "color": new_group.color,
+        "users": []
+    }
+
+
 def member_to_response(member: User) -> dict:
     status_info = STATUS[member.status]
     return {
@@ -52,24 +72,13 @@ def group_to_response(group: Group) -> dict:
         "members": [member_to_response(member) for member in group.members]
     }
 
-def create_group(payload: schemas.CreateGroup, db: Session):
-    new_group = Group(
-        name = payload.name,
-        emoji = payload.emoji,
-        color = payload.color
-    )
-    db.add(new_group)
-    db.commit()
-    db.refresh(new_group)
-    return {
-        "id": new_group.id,
-        "name": new_group.name,
-        "emoji": new_group.emoji,
-        "color": new_group.color,
-        "users": []
-    }
+def get_groups(db: Session) -> list[dict]:
+    groups = list[db.scalar(select(Group).all())]
+    return groups
 
-
+def get_group_by_id(group_id: int, db: Session)-> list[dict]:
+    group = ()
+    return group_to_response(group)
 
 def update_status(payload: schemas.UpdateState, db: Session):
     new_status = payload.status
