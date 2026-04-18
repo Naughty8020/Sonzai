@@ -104,7 +104,7 @@ def member_to_response(member: User) -> dict:
     return {
         "id": member.id,
         "name": member.name,
-        "initials": member.initials,
+        "initial": member.initial,
         "avatarBg": member.avatar_bg,
         "avatarText": member.avatar_text,
         "status": member.status,
