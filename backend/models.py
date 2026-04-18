@@ -31,6 +31,7 @@ class User(Base):
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
 
     name: Mapped[str] = mapped_column(nullable=False)
+    initial: Mapped[str] = mapped_column(nullable=False)
     avatar_bg: Mapped[str] = mapped_column(nullable=False)
     avatar_text: Mapped[str] = mapped_column(nullable=False)
     status: Mapped[StatusType] = mapped_column(StatusType, nullable=False, default=StatusType[0])
