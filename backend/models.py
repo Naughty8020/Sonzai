@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime, timezone, timedelta
 from typing import Literal
@@ -35,6 +35,6 @@ class User(Base):
     avatar_bg: Mapped[str] = mapped_column(nullable=False)
     avatar_text: Mapped[str] = mapped_column(nullable=False)
     status: Mapped[StatusType] = mapped_column(StatusType, nullable=False, default=StatusType[0])
-    update_time: Mapped[datetime] = mapped_column(datetime(timezone=True), nullable=False)
+    update_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     group: Mapped[relationship] = relationship("Group", back_populates="users")
