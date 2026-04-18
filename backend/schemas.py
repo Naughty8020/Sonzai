@@ -5,3 +5,8 @@ class CreateGroup(BaseModel):
     name: str = Field(..., min_length=1)
     emoji: str = Field(..., min_length=1)
     color: str 
+    
+class UpdateState(BaseModel):
+    status: StatusType
+
+
