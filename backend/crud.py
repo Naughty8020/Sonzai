@@ -1,7 +1,24 @@
 from sqlalchemy.orm import Session
-
+from datetime import datetime, timezone
 import schemas
 from models import Group
+
+def format_elapsed_time(updated_at: datetime) -> str:
+    now = datetime.now(timezone.utc)
+
+    if updated_at.tzinfo is None:
+        updated_at = updated_at.replace(tzinfo=timezone.utc)
+
+    seconds = int((now - updated_at).total_seconds())
+
+    if seconds < 60:
+        return "今"
+    if seconds < 3600:
+        return f"{seconds // 60}分前"
+    if seconds < 86400:
+        return f"{seconds // 3600}時間前"
+    else:
+        return f"{seconds // 86400}日前"
 
 def create_group(payload: schemas.CreateGroup, db: Session):
     new_group = Group(
