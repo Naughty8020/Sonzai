@@ -1,3 +1,5 @@
+"use client";
+
 import type { Group } from "@/app/data/group";
 
 // ── SidebarContent をトップレベルコンポーネントとして定義 ──
