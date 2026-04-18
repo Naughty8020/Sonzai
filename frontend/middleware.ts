@@ -6,12 +6,6 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isLoginPage = pathname.startsWith("/login");
 
-  if (!token && !isLoginPage) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    return NextResponse.redirect(loginUrl);
-  }
-
   if (token && isLoginPage) {
     const homeUrl = request.nextUrl.clone();
     homeUrl.pathname = "/";
