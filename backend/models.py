@@ -17,7 +17,7 @@ class Group(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     emoji: Mapped[str] = mapped_column(nullable=False)
     color: Mapped[str] = mapped_column(nullable=False)
-    users: Mapped[relationship] = relationship(
+    members: Mapped[relationship] = relationship(
         "User",
         back_populates="group",
         cascade="all, delete-orphan",
