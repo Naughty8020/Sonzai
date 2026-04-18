@@ -9,4 +9,16 @@ class CreateGroup(BaseModel):
 class UpdateState(BaseModel):
     status: StatusType
 
+class MemberSeed(BaseModel):
+    name: str
+    initials: str
+    avatar_bg: str
+    avatar_text: str
+    status: StatusType
+
+class GroupSeed(BaseModel):
+    name: str
+    emoji: str
+    color: str
+    members: list[MemberSeed]
 
