@@ -1,7 +1,7 @@
 import { useAtomValue } from "jotai";
 import { activeGroupAtom } from "@/app/store/groupAtoms";
+import type { StatusType } from "@/app/data/group";
 
-type StatusType = "ok" | "busy" | "home" | "sleep" | "sos" | "out";
 
 
 
