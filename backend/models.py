@@ -1,12 +1,11 @@
+from __future__ import annotations
 from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime, timezone, timedelta
 from typing import Literal
-from __future__ import annotations
 from datetime import datetime, timezone
 from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column
-from db import Base
 
 StatusType = Literal["ok", "busy", "home", "out", "sleep", "sos"]
 
@@ -40,11 +39,11 @@ class Group(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     emoji: Mapped[str] = mapped_column(nullable=False)
     color: Mapped[str] = mapped_column(nullable=False)
-    members: Mapped[relationship] = relationship(
+    members: Mapped[list[Member]] = relationship(
         "Member",
-        back_populates="groups",
+        back_populates="group",
         cascade="all, delete-orphan",
-        order_by="member.id"
+        order_by="Member.id"
     )
 
 class Member(Base):
@@ -57,7 +56,7 @@ class Member(Base):
     initial: Mapped[str] = mapped_column(nullable=False)
     avatar_bg: Mapped[str] = mapped_column(nullable=False)
     avatar_text: Mapped[str] = mapped_column(nullable=False)
-    status: Mapped[StatusType] = mapped_column(StatusType, nullable=False, default=StatusType[0])
+    status: Mapped[StatusType] = mapped_column(nullable=False, default="ok")
     update_time: Mapped[datetime] = mapped_column(DateTime(timezone=timedelta(hours=9)), nullable=False)
 
-    group: Mapped[relationship] = relationship("Group", back_populates="members")
+    group: Mapped[Group] = relationship("Group", back_populates="members")
