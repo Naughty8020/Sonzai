@@ -152,7 +152,7 @@ def update_status(payload: schemas.UpdateState, user_id: int, db: Session):
     db.refresh(user)
     return member_to_response(user)
 
-def create_invite_link(db: Session, group_id: int) -> dict:
+def create_invite_link(group_id: int, db: Session) -> dict:
     group = db.scalar(select(Group).where(Group.id == group_id))
     return {
         "group_id": group.id,
