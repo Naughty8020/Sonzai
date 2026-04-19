@@ -1,8 +1,8 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session, selectinload
-from datetime import datetime, timezone
+from sqlalchemy.orm import Session
+from datetime import datetime, timezone, timedelta
 import schemas
-from models import Group, User
+from models import Group, User, now_time_jst
 
 STATUS = {
     "ok": {"label": "元気", "emoji": "😊"},
@@ -64,10 +64,10 @@ SEED_GROUPS: list[schemas.GroupSeed] = [
 ]
 
 def format_elapsed_time(updated_at: datetime) -> str:
-    now = datetime.now(timezone.utc)
+    now = now_time_jst
 
     if updated_at.tzinfo is None:
-        updated_at = updated_at.replace(tzinfo=timezone.utc)
+        updated_at = updated_at.replace(tzinfo=timezone(timedelta(hour=9)))
 
     seconds = int((now - updated_at).total_seconds())
 
@@ -95,9 +95,23 @@ def create_group(payload: schemas.CreateGroup, db: Session):
         "name": new_group.name,
         "emoji": new_group.emoji,
         "color": new_group.color,
-        "users": []
+        "members": []
     }
 
+def create_member(group_id: int, payload: schemas.MemberCreate, db: Session) -> dict:
+    group = db.scalar(select(Group).where(Group.id == group_id))
+    member = User(
+        group_id=group.id,
+        name=payload.name.strip(),
+        initials=payload.initials,
+        avatar_bg=payload.avatarBg,
+        avatar_text=payload.avatarText,
+        status=payload.status,
+    )
+    db.add(member)
+    db.commit()
+    db.refresh(member)
+    return member_to_response(member)
 
 def member_to_response(member: User) -> dict:
     status_info = STATUS[member.status]
@@ -130,14 +144,15 @@ def get_group_by_id(group_id: int, db: Session)-> list[dict]:
     group = db.scalar(select(Group).where(Group.id == group_id))
     return group_to_response(group)
 
-def update_status(payload: schemas.UpdateState, db: Session):
-    new_status = payload.status
-    db.add(new_status)
+def update_status(payload: schemas.UpdateState, user_id: int, db: Session):
+    user = db.scalar(select(User).where(User.id == user_id))
+    user.status = payload.status
+    user.update_time = datetime.now(timezone(timedelta(hours=9)))
     db.commit()
-    db.refresh(new_status)
-    return new_status
+    db.refresh(user)
+    return member_to_response(user)
 
-def create_invite_link(db: Session, group_id: int) -> dict:
+def create_invite_link(group_id: int, db: Session) -> dict:
     group = db.scalar(select(Group).where(Group.id == group_id))
     return {
         "group_id": group.id,
