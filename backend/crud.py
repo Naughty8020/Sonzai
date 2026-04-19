@@ -91,10 +91,14 @@ SEED_GROUPS: list[schemas.GroupSeed] = [
         emoji="🏠",
         color="bg-purple-50",
         members=[
-            {"name": "お父さん", "initial": "父", "avatar_bg": "bg-blue-100", "avatar_text": "text-blue-800", "status": "ok"},
-            {"name": "お母さん", "initial": "母", "avatar_bg": "bg-green-100", "avatar_text": "text-green-800", "status": "busy"},
-            {"name": "妹", "initial": "妹", "avatar_bg": "bg-pink-100", "avatar_text": "text-pink-800", "status": "sleep"},
-            {"name": "兄", "initial": "兄", "avatar_bg": "bg-amber-100", "avatar_text": "text-amber-800", "status": "home"},
+            {"name": "お父さん", "initial": "父", "avatar_bg": "bg-blue-100",
+                "avatar_text": "text-blue-800", "status": "ok"},
+            {"name": "お母さん", "initial": "母", "avatar_bg": "bg-green-100",
+                "avatar_text": "text-green-800", "status": "busy"},
+            {"name": "妹", "initial": "妹", "avatar_bg": "bg-pink-100",
+                "avatar_text": "text-pink-800", "status": "sleep"},
+            {"name": "兄", "initial": "兄", "avatar_bg": "bg-amber-100",
+                "avatar_text": "text-amber-800", "status": "home"},
         ],
     ),
     schemas.GroupSeed(
@@ -102,9 +106,12 @@ SEED_GROUPS: list[schemas.GroupSeed] = [
         emoji="⭐",
         color="bg-green-50",
         members=[
-            {"name": "さくら", "initial": "さ", "avatar_bg": "bg-pink-100", "avatar_text": "text-pink-800", "status": "ok"},
-            {"name": "けんた", "initial": "け", "avatar_bg": "bg-purple-100", "avatar_text": "text-purple-800", "status": "busy"},
-            {"name": "みほ", "initial": "み", "avatar_bg": "bg-green-100", "avatar_text": "text-green-800", "status": "home"},
+            {"name": "さくら", "initial": "さ", "avatar_bg": "bg-pink-100",
+                "avatar_text": "text-pink-800", "status": "ok"},
+            {"name": "けんた", "initial": "け", "avatar_bg": "bg-purple-100",
+                "avatar_text": "text-purple-800", "status": "busy"},
+            {"name": "みほ", "initial": "み", "avatar_bg": "bg-green-100",
+                "avatar_text": "text-green-800", "status": "home"},
         ],
     ),
 ]
@@ -267,3 +274,9 @@ def seed_database(db: Session) -> None:
             db.add(member)
 
     db.commit()
+
+
+def search_users_by_name(db: Session, name_query: str) -> list[dict]:
+    stmt = select(User).where(User.name.ilike(f"%{name_query}%"))
+    users = db.scalars(stmt).all()
+    return [{"id": user.id, "name": user.name, "email": user.email} for user in users]

@@ -9,9 +9,11 @@ from .models import User, Base
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=db_engine)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -83,3 +85,8 @@ def patch_member_status(
 @app.post("/groups/{group_id}/invite")
 def invite_link(group_id: int, db: Session = Depends(get_db)):
     return crud.create_invite_link(group_id, db)
+
+
+@app.get("/users/search")
+def search_users(name: str, db: Session = Depends(get_db)):
+    return crud.search_users_by_name(db, name)
