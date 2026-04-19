@@ -9,7 +9,7 @@ export const EMOJI_OPTIONS = ["🏠", "⭐", "💼", "🎮", "🎵", "📚", "�
 export const groupsAtom = atom<Group[]>(initialGroups);
 export const activeGroupIdAtom = atom<number>(1);
 export const showModalAtom = atom(false);
-export const showMobileMenuAtom = atom(false);
+
 export const myStatusAtom = atom<StatusType>("home");
 export const newGroupNameAtom = atom("");
 export const selectedEmojiAtom = atom(EMOJI_OPTIONS[0]);
