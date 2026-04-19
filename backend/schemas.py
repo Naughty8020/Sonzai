@@ -6,6 +6,13 @@ class CreateGroup(BaseModel):
     emoji: str = Field(..., min_length=1)
     color: str 
     
+class UserCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=50)
+    initials: str
+    avatarBg: str
+    avatarText: str
+    status: StatusType
+
 class UpdateState(BaseModel):
     status: StatusType
 
