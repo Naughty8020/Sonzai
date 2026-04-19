@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type FormEvent } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
-import { createMockToken, hasAuthCookieInBrowser, setAuthCookie } from "@/lib/auth";
+import { hasAuthCookieInBrowser } from "@/lib/auth";
+import { handleSubmit as handleAuthSubmit } from "@/app/api/auth";
 import AuthToggle from "@/app/components/Auth/toggle";
 import AuthHeader from "@/app/components/Auth/AuthHeader";
 import AuthFormCard from "@/app/components/Auth/AuthFormCard";
@@ -32,32 +33,18 @@ export default function LoginPage() {
     }
   }, [router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const handleSubmit = (e: FormEvent) =>
+    handleAuthSubmit(e, {
+      mode,
+      name,
+      email,
+      password,
+      setLoading,
+      setError,
+      onSuccess: () => router.replace("/"),
+    });
 
-    if (mode === "register" && !name.trim()) {
-      setError("お名前を入力してください");
-      return;
-    }
-    if (!email.trim()) {
-      setError("メールアドレスを入力してください");
-      return;
-    }
-    if (password.length < 8) {
-      setError("パスワードは8文字以上で入力してください");
-      return;
-    }
-
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
-
-    const token = createMockToken(email.trim());
-    setAuthCookie(token);
-
-    setLoading(false);
-    router.replace("/");
-  };
+  
 
 
 
