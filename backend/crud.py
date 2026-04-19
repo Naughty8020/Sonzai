@@ -98,6 +98,20 @@ def create_group(payload: schemas.CreateGroup, db: Session):
         "members": []
     }
 
+def create_member(group_id: int, payload: schemas.MemberCreate, db: Session) -> dict:
+    group = db.scalar(select(Group).where(Group.id == group_id))
+    member = User(
+        group_id=group.id,
+        name=payload.name.strip(),
+        initials=payload.initials,
+        avatar_bg=payload.avatarBg,
+        avatar_text=payload.avatarText,
+        status=payload.status,
+    )
+    db.add(member)
+    db.commit()
+    db.refresh(member)
+    return member_to_response(member)
 
 def member_to_response(member: User) -> dict:
     status_info = STATUS[member.status]
