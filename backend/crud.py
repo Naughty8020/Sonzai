@@ -286,3 +286,27 @@ def search_users_by_name(db: Session, name_query: str) -> list[dict]:
     stmt = select(User).where(User.name.ilike(f"%{name_query}%"))
     users = db.scalars(stmt).all()
     return [{"id": user.id, "name": user.name, "email": user.email} for user in users]
+
+
+from fastapi import HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from .models import Group
+
+
+def delete_group(group_id: int, db: Session) -> dict:
+    group = db.scalar(select(Group).where(Group.id == group_id))
+    if group is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="グループが存在しません",
+        )
+
+    db.delete(group)
+    db.commit()
+
+    return {
+        "message": "グループを削除しました",
+        "deletedGroupId": group_id,
+    }
