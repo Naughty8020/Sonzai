@@ -6,7 +6,7 @@ class CreateGroup(BaseModel):
     emoji: str = Field(..., min_length=1)
     color: str 
     
-class UserCreate(BaseModel):
+class MemberCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=50)
     initials: str
     avatarBg: str
