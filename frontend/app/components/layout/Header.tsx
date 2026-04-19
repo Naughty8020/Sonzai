@@ -1,23 +1,28 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
 import { activeGroupAtom, showToastAtom } from "@/app/store/groupAtoms";
 import { clearAuthCookie } from "@/lib/auth";
 
 export default function Header() {
+
   const activeGroup = useAtomValue(activeGroupAtom);
   const showToast = useSetAtom(showToastAtom);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const router = useRouter();
 
     if (!activeGroup) {
       return null;
     }
 
+
     const handleLogout = () => {
       clearAuthCookie();
       showToast("ログアウトしました");
       setIsUserMenuOpen(false);
+      router.push("/login");
     };
 
     const handleProfile = () => {
