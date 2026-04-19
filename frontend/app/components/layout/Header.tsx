@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAtomValue, useSetAtom } from "jotai";
-import { activeGroupAtom, showToastAtom } from "@/app/store/groupAtoms";
+import { activeGroupAtom, showToastAtom, groupsAtom } from "@/app/store/groupAtoms";
 import { clearAuthCookie } from "@/lib/auth";
+import { fetchGroups } from "@/app/api/fetchGroups";
 
 type UserCandidate = {
   id: string;
@@ -27,6 +28,7 @@ function pickAvatarColor(name: string) {
 export default function Header() {
   const activeGroup = useAtomValue(activeGroupAtom);
   const showToast = useSetAtom(showToastAtom);
+  const setGroups = useSetAtom(groupsAtom);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [inviteInput, setInviteInput] = useState("");
@@ -112,6 +114,7 @@ export default function Header() {
       if (!res.ok) throw new Error();
       showToast("メンバーを追加しました");
       handleInviteClose();
+      fetchGroups().then(setGroups).catch(() => {});
     } catch {
       showToast("招待に失敗しました");
     } finally {
