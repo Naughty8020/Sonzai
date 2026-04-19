@@ -34,7 +34,7 @@ export async function handleSubmit(e: FormEvent, params: HandleSubmitParams) {
   setLoading(true);
   try {
     const baseUrl = "http://localhost:8000";
-    const endpoint = mode === "register" ? "/auth/register" : "/auth/login";
+    const endpoint = mode === "register" ? "/login/register" : "/login";
 
     const res = await fetch(`${baseUrl}${endpoint}`, {
       method: "POST",
