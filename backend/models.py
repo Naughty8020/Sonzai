@@ -52,6 +52,12 @@ class Member(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
 
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=True,
+        index=True,
+    )
+    
     name: Mapped[str] = mapped_column(nullable=False)
     initial: Mapped[str] = mapped_column(nullable=False)
     avatar_bg: Mapped[str] = mapped_column(nullable=False)

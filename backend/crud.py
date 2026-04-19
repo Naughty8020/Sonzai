@@ -206,7 +206,7 @@ def get_my_groups(db: Session, user_id: int) -> list[dict]:
     my_group = (
         select(Group)
         .join(Member, Member.group_id == Group.id)
-        .where(Member.id == user_id)
+        .where(Member.user_id == user_id)
         .distinct()
     )
     groups = db.scalars(my_group).all()
