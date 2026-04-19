@@ -1,3 +1,4 @@
+
 import type { StatusType } from "@/app/type/Status";
 
 export const statusStyles: Record<StatusType, { badge: string; dot: string }> = {
@@ -11,4 +12,27 @@ export const statusStyles: Record<StatusType, { badge: string; dot: string }> = 
 
 export function getOtherStatus(status: StatusType) {
   return statusStyles[status];
+}
+
+// 他メンバーのstatus状況を取得する関数
+export async function fetchOtherStatuses(groupId: number, token?: string) {
+  const res = await fetch(`http://localhost:8000/groups/${groupId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error("ステータス取得に失敗しました");
+  }
+
+  const data = await res.json();
+  // data.members: [{ name, status, ... }]
+  return data.members.map((member: { name: string; status: StatusType }) => ({
+    name: member.name,
+    status: member.status,
+  }));
 }
