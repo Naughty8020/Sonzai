@@ -3,11 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from . import crud, schemas
-from .db import get_db
+from .db import get_db, db_engine
 from .login import get_current_login_user
-from .models import User
+from .models import User, Base
 
 app = FastAPI()
+
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=db_engine)
 
 app.add_middleware(
     CORSMiddleware,
