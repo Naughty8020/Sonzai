@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { useRouter } from "next/navigation";
-import { createMockToken, hasAuthCookieInBrowser, setAuthCookie } from "@/lib/auth";
+import { hasAuthCookieInBrowser, setAuthCookie } from "@/lib/auth";
 import AuthToggle from "@/app/components/Auth/toggle";
 import AuthHeader from "@/app/components/Auth/AuthHeader";
 import AuthFormCard from "@/app/components/Auth/AuthFormCard";
@@ -50,13 +50,49 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 500));
+    try {
+      const baseUrl = "http://localhost:8000";
+      const endpoint = mode === "register" ? "/auth/register" : "/auth/login";
 
-    const token = createMockToken(email.trim());
-    setAuthCookie(token);
+      const res = await fetch(`${baseUrl}${endpoint}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          ...(mode === "register" ? { name: name.trim() } : {}),
+        }),
+      });
 
-    setLoading(false);
-    router.replace("/");
+      const payload = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        const message =
+          (payload && typeof payload.detail === "string" && payload.detail) ||
+          (mode === "register" ? "新規登録に失敗しました" : "ログインに失敗しました");
+        setError(message);
+        return;
+      }
+
+      const token =
+        (payload && typeof payload.access_token === "string" && payload.access_token) ||
+        (payload && typeof payload.token === "string" && payload.token) ||
+        null;
+
+      if (!token) {
+        setError("認証トークンの取得に失敗しました");
+        return;
+      }
+
+      setAuthCookie(token);
+      router.replace("/");
+    } catch {
+      setError("サーバーに接続できませんでした");
+    } finally {
+      setLoading(false);
+    }
   };
 
 
