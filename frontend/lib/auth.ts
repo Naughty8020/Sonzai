@@ -1,6 +1,13 @@
 export const AUTH_COOKIE_NAME = "imhere_token";
 export const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 
+
+
+export function getAuthCookie(): string | null {
+  if (typeof document === "undefined") return null;
+  return getAuthTokenFromCookieString(document.cookie);
+}
+
 export function createMockToken(email: string): string {
   return `token-${email}-${Date.now()}`;
 }
