@@ -1,23 +1,8 @@
-export type StatusType = "ok" | "busy" | "home" | "out" | "sleep" | "sos";
+import type { Group } from "../type/Group";
 
-export interface Member {
-  name: string;
-  initials: string;
-  avatarBg: string;
-  avatarText: string;
-  status: StatusType;
-  statusLabel: string;
-  statusEmoji: string;
-  time: string;
-}
 
-export interface Group {
-  id: number;
-  name: string;
-  emoji: string;
-  color: string;
-  members: Member[];
-}
+
+
 
 export const initialGroups: Group[] = [
   {

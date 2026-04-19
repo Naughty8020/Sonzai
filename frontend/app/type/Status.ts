@@ -1,0 +1,1 @@
+export type StatusType = "ok" | "busy" | "home" | "out" | "sleep" | "sos";

@@ -1,6 +1,6 @@
 "use client";
 
-import type { Group } from "@/app/data/group";
+import type { Group } from "@/app/type/Group";
 
 // ── SidebarContent をトップレベルコンポーネントとして定義 ──
 interface SidebarContentProps {

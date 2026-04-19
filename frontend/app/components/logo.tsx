@@ -1,4 +1,4 @@
-// ── ロゴ部分も共通コンポーネントとして切り出し ──
+
 export default function SidebarLogo() {
   return (
     <div className="px-4 py-4 border-b border-zinc-200 dark:border-zinc-800">

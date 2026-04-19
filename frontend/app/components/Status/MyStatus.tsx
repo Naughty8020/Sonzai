@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom, useSetAtom } from "jotai";
-import type { StatusType } from "@/app/data/group";
+import type { StatusType } from "@/app/type/Status";
 import { myStatusAtom, showToastAtom } from "@/app/store/groupAtoms";
 
 
