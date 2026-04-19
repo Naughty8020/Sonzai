@@ -10,6 +10,20 @@ type UserCandidate = {
   avatar?: string;
 };
 
+const AVATAR_COLORS = [
+  { bg: "bg-blue-100", text: "text-blue-800" },
+  { bg: "bg-green-100", text: "text-green-800" },
+  { bg: "bg-pink-100", text: "text-pink-800" },
+  { bg: "bg-purple-100", text: "text-purple-800" },
+  { bg: "bg-amber-100", text: "text-amber-800" },
+  { bg: "bg-red-100", text: "text-red-800" },
+];
+
+function pickAvatarColor(name: string) {
+  const index = name.charCodeAt(0) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[index];
+}
+
 export default function Header() {
   const activeGroup = useAtomValue(activeGroupAtom);
   const showToast = useSetAtom(showToastAtom);
@@ -24,7 +38,6 @@ export default function Header() {
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
-  // ✅ useCallbackをearly returnより前に移動
   const searchUsers = useCallback(async (name: string) => {
     if (!name.trim()) { setCandidates([]); return; }
     setIsSearching(true);
@@ -41,7 +54,6 @@ export default function Header() {
     }
   }, []);
 
-  // ✅ early returnはHooksをすべて宣言した後
   if (!activeGroup) return null;
 
   const handleLogout = () => {
@@ -78,17 +90,27 @@ export default function Header() {
   };
 
   const handleInvite = async () => {
-    const username = selectedCandidate?.name ?? inviteInput.trim();
-    if (!username) { showToast("ユーザー名を入力してください"); return; }
+    const user = selectedCandidate;
+    if (!user) { showToast("ユーザーを選択してください"); return; }
     setIsInviting(true);
     try {
-      const res = await fetch(`/api/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ groupId: activeGroup.id, username }),
-      });
+      const color = pickAvatarColor(user.name);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/groups/${activeGroup.id}/members`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: user.name,
+            initial: user.name.charAt(0),
+            avatarBg: color.bg,
+            avatarText: color.text,
+            status: "ok",
+          }),
+        }
+      );
       if (!res.ok) throw new Error();
-      showToast("招待しました");
+      showToast("メンバーを追加しました");
       handleInviteClose();
     } catch {
       showToast("招待に失敗しました");
@@ -143,7 +165,7 @@ export default function Header() {
               <button
                 onClick={handleInvite}
                 className="px-3 py-2 rounded-lg bg-blue-500 text-white text-[13px] hover:bg-blue-600 disabled:opacity-60 transition-colors"
-                disabled={isInviting}
+                disabled={isInviting || !selectedCandidate}
               >
                 招待
               </button>
