@@ -1,6 +1,7 @@
 "use client";
 
 import type { Group } from "@/app/type/Group";
+import { useDeleteGroup } from "@/app/api/useDeleteGroup";
 
 // ── SidebarContent をトップレベルコンポーネントとして定義 ──
 interface SidebarContentProps {
@@ -12,6 +13,7 @@ interface SidebarContentProps {
 
 
 export default function SidebarContent({ groups, activeGroupId, onSelectGroup, onOpenModal }: SidebarContentProps) {
+  const { handleDeleteGroup } = useDeleteGroup();
   return (
     <>
       <div className="flex-1 overflow-y-auto p-2">
@@ -19,29 +21,39 @@ export default function SidebarContent({ groups, activeGroupId, onSelectGroup, o
           グループ
         </p>
         {groups.map((g) => (
-          <button
-            key={g.id}
-            onClick={() => onSelectGroup(g.id)}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
-              g.id === activeGroupId
-                ? "bg-indigo-50 dark:bg-indigo-950"
-                : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-            }`}
-          >
-            <div className={`w-8 h-8 rounded-full ${g.color} flex items-center justify-center text-base shrink-0`}>
-              {g.emoji}
-            </div>
-            <span className={`text-[13px] flex-1 truncate ${
-              g.id === activeGroupId
-                ? "font-medium text-indigo-800 dark:text-indigo-300"
-                : "text-zinc-700 dark:text-zinc-300"
-            }`}>
-              {g.name}
-            </span>
-            <span className="text-[11px] text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-full shrink-0">
-              {g.members.length}
-            </span>
-          </button>
+          <div key={g.id} className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors ${
+            g.id === activeGroupId
+              ? "bg-indigo-50 dark:bg-indigo-950"
+              : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          }`}>
+            <button
+              onClick={() => onSelectGroup(g.id)}
+              className="flex items-center flex-1 gap-2.5 text-left"
+            >
+              <div className={`w-8 h-8 rounded-full ${g.color} flex items-center justify-center text-base shrink-0`}>
+                {g.emoji}
+              </div>
+              <span className={`text-[13px] flex-1 truncate ${
+                g.id === activeGroupId
+                  ? "font-medium text-indigo-800 dark:text-indigo-300"
+                  : "text-zinc-700 dark:text-zinc-300"
+              }`}>
+                {g.name}
+              </span>
+              <span className="text-[11px] text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded-full shrink-0">
+                {g.members.length}
+              </span>
+            </button>
+            <button
+              onClick={() => handleDeleteGroup(g.id)}
+              className="ml-1 text-zinc-300 hover:text-red-500 transition-colors p-1"
+              title="グループ削除"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         ))}
       </div>
       <div className="p-2 border-t border-zinc-200 dark:border-zinc-800">

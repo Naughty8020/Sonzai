@@ -90,3 +90,9 @@ def invite_link(group_id: int, db: Session = Depends(get_db)):
 @app.get("/users/search")
 def search_users(name: str, db: Session = Depends(get_db)):
     return crud.search_users_by_name(db, name)
+
+
+# グループ削除エンドポイント
+@app.delete("/groups/{group_id}")
+def delete_group(group_id: int, db: Session = Depends(get_db)):
+    return crud.delete_group(group_id, db)

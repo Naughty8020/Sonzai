@@ -1,11 +1,23 @@
 from fastapi import HTTPException, status
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-from datetime import datetime, timezone, timedelta
-
-from . import schemas
-from .models import Group, User, Member
 from .login import create_login_token, hash_password, verify_password
+from .models import Group, User, Member
+from . import schemas
+from datetime import datetime, timezone, timedelta
+from sqlalchemy.orm import Session
+from sqlalchemy import select
+
+
+def delete_group(group_id: int, db: Session) -> dict:
+    group = db.scalar(select(Group).where(Group.id == group_id))
+    if group is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="グループが存在しません",
+        )
+    db.delete(group)
+    db.commit()
+    return {"message": f"グループ（ID: {group_id}）を削除しました"}
+
 
 JST = timezone(timedelta(hours=9))
 
