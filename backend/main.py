@@ -50,8 +50,11 @@ def read_current_login_user(
 
 
 @app.get("/groups")
-def read_groups(db: Session = Depends(get_db)):
-    return crud.get_groups(db)
+def get_groups(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_login_user),
+):
+    return crud.get_my_groups(db, current_user.id)
 
 
 @app.get("/groups/{group_id}")

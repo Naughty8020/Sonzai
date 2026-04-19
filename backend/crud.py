@@ -202,8 +202,14 @@ def group_to_response(group: Group) -> dict:
     }
 
 
-def get_groups(db: Session) -> list[dict]:
-    groups = db.scalars(select(Group)).all()
+def get_my_groups(db: Session, user_id: int) -> list[dict]:
+    my_group = (
+        select(Group)
+        .join(Member, Member.group_id == Group.id)
+        .where(Member.id == user_id)
+        .distinct()
+    )
+    groups = db.scalars(my_group).all()
     return [group_to_response(group) for group in groups]
 
 
