@@ -1,8 +1,70 @@
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone, timedelta
 import schemas
-from models import Group, User, now_time_jst
+from models import Group, User
+from login import create_login_token, hash_password, verify_password
+
+
+
+def normalize_email(email: str) -> str:
+    return email.strip().lower()
+
+
+def user_to_login_response(user: User) -> schemas.LoginUserResponse:
+    return schemas.LoginUserResponse(
+        id=user.id,
+        name=user.name,
+        email=user.email,
+    )
+
+
+def build_login_token_response(user: User) -> schemas.LoginTokenResponse:
+    return schemas.LoginTokenResponse(
+        access_token=create_login_token(user.id),
+        token_type="bearer",
+        user=user_to_login_response(user),
+    )
+
+
+def get_user_by_email(db: Session, email: str) -> User | None:
+    stmt = select(User).where(User.email == normalize_email(email))
+    return db.scalar(stmt)
+
+
+def register_login_user(db: Session, payload: schemas.LoginRegister) -> schemas.LoginTokenResponse:
+    email = normalize_email(payload.email)
+
+    existing_user = get_user_by_email(db, email)
+    if existing_user is not None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="このメールアドレスはすでに使われています",
+        )
+
+    user = User(
+        name=payload.name.strip(),
+        email=email,
+        password_hash=hash_password(payload.password),
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return build_login_token_response(user)
+
+
+def login_user(db: Session, payload: schemas.LoginRequest) -> schemas.LoginTokenResponse:
+    user = get_user_by_email(db, payload.email)
+
+    if user is None or not verify_password(payload.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="メールアドレスまたはパスワードが違います",
+        )
+
+    return build_login_token_response(user)
 
 STATUS = {
     "ok": {"label": "元気", "emoji": "😊"},
@@ -63,11 +125,12 @@ SEED_GROUPS: list[schemas.GroupSeed] = [
     ),
 ]
 
+
 def format_elapsed_time(updated_at: datetime) -> str:
-    now = now_time_jst
+    now = datetime.now(timezone(timedelta(hours=9)))
 
     if updated_at.tzinfo is None:
-        updated_at = updated_at.replace(tzinfo=timezone(timedelta(hour=9)))
+        updated_at = updated_at.replace(tzinfo=timezone(timedelta(hours=9)))
 
     seconds = int((now - updated_at).total_seconds())
 
@@ -103,7 +166,7 @@ def create_member(group_id: int, payload: schemas.MemberCreate, db: Session) -> 
     member = User(
         group_id=group.id,
         name=payload.name.strip(),
-        initials=payload.initials,
+        initial=payload.initial,
         avatar_bg=payload.avatarBg,
         avatar_text=payload.avatarText,
         status=payload.status,
@@ -124,7 +187,7 @@ def member_to_response(member: User) -> dict:
         "status": member.status,
         "statusLabel": status_info["label"],
         "statusEmoji": status_info["emoji"],
-        "time": format_elapsed_time(member.updated_at),
+        "time": format_elapsed_time(member.update_time),
     }
 
 def group_to_response(group: Group) -> dict:

@@ -2,13 +2,36 @@ from sqlalchemy import ForeignKey, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime, timezone, timedelta
 from typing import Literal
+from __future__ import annotations
+from datetime import datetime, timezone
+from sqlalchemy import DateTime, String
+from sqlalchemy.orm import Mapped, mapped_column
+from db import Base
 
 StatusType = Literal["ok", "busy", "home", "out", "sleep", "sos"]
 
-now_time_jst = datetime.now(timezone(timedelta(hours=9)))
+now = datetime.now(timezone(timedelta(hours=9)))
 
 class Base(DeclarativeBase):
     pass
+
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50), nullable=False)
+    email: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        unique=True,
+        index=True,
+    )
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=now,
+    )
 
 class Group(Base):
     __tablename__ = "groups"
@@ -18,14 +41,14 @@ class Group(Base):
     emoji: Mapped[str] = mapped_column(nullable=False)
     color: Mapped[str] = mapped_column(nullable=False)
     members: Mapped[relationship] = relationship(
-        "User",
-        back_populates="group",
+        "Member",
+        back_populates="groups",
         cascade="all, delete-orphan",
-        order_by="user.id"
+        order_by="member.id"
     )
 
-class User(Base):
-    __tablename__ = "users"
+class Member(Base):
+    __tablename__ = "members"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"))
@@ -35,6 +58,6 @@ class User(Base):
     avatar_bg: Mapped[str] = mapped_column(nullable=False)
     avatar_text: Mapped[str] = mapped_column(nullable=False)
     status: Mapped[StatusType] = mapped_column(StatusType, nullable=False, default=StatusType[0])
-    update_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    update_time: Mapped[datetime] = mapped_column(DateTime(timezone=timedelta(hours=9)), nullable=False)
 
-    group: Mapped[relationship] = relationship("Group", back_populates="users")
+    group: Mapped[relationship] = relationship("Group", back_populates="members")

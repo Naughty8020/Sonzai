@@ -1,6 +1,25 @@
 from pydantic import BaseModel, Field
 from models import StatusType
 
+class UserRegister(BaseModel):
+    name: str = Field(..., min_length=1, max_length=50)
+    email: str = Field(..., min_length=1, max_length=255)
+    password: str = Field(..., min_length=8, max_length=255)
+
+class UserLogin(BaseModel):
+    email: str = Field(..., min_length=1, max_length=255)
+    password: str = Field(..., min_length=8, max_length=255)
+
+class CurrentUserResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: CurrentUserResponse
+
 class CreateGroup(BaseModel):
     name: str = Field(..., min_length=1)
     emoji: str = Field(..., min_length=1)
